@@ -11,7 +11,7 @@ public class PlayerControl : MonoBehaviour {
     public Transform groundCheck;    
     public float groundRadius = 0.2f;
     public LayerMask whatIsGround;
-    public float jumpForce = 700f;
+    public float jumpForce = 70f;
     public bool doubleJump = false;
 
     private Rigidbody2D rb2d;
