@@ -6,12 +6,12 @@ public class PlayerControl : MonoBehaviour {
 
     [HideInInspector] public bool facingRight = true;    
 
-    public float maxSpeed = 10f;        
+    public float maxSpeed = 5f;        
     public bool grounded = false;
     public Transform groundCheck;    
     public float groundRadius = 0.2f;
     public LayerMask whatIsGround;
-    public float jumpForce = 70f;
+    public float jumpForce = 40f;
     public bool doubleJump = false;
 
     private Rigidbody2D rb2d;
