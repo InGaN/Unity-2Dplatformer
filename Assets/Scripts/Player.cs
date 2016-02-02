@@ -10,6 +10,14 @@ public class Player : MonoBehaviour {
     float accelerationTimeGrounded = 0.1f;
     float moveSpeed = 6;
 
+    public Vector2 wallJumbClimb;
+    public Vector2 wallJumpOff;
+    public Vector2 wallLeap;
+
+    public float wallSlideSpeedMax = 3;
+    public float wallStickTime = 0.25f;
+    float timeToWallUnstick; 
+
     float gravity;
     float jumpVelocity;
     Vector3 velocity;
@@ -28,19 +36,61 @@ public class Player : MonoBehaviour {
 
     void Update()
     {
-        if(controller.collisions.above || controller.collisions.below) {
-            velocity.y = 0;
-        }
-        
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        int wallDirectionX = (controller.collisions.left) ? -1 : 1;
 
-        if (Input.GetAxis("Jump") > 0 && controller.collisions.below) {// if jump pressed and player is standing on surface 
-            velocity.y = jumpVelocity;
-        }
         float targetVelocityX = input.x * moveSpeed;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing,
             (controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne
             );
+
+        bool wallSliding = false;
+        if((controller.collisions.left || controller.collisions.right) && !controller.collisions.below && velocity.y < 0) {
+            wallSliding = true;
+
+            if(velocity.y < - wallSlideSpeedMax) {
+                velocity.y = -wallSlideSpeedMax;
+            }
+
+            if(timeToWallUnstick > 0) {
+                velocityXSmoothing = 0;
+                velocity.x = 0;
+
+                if(input.x != wallDirectionX && input.x != 0) {
+                    timeToWallUnstick -= Time.deltaTime;
+                }                
+                else {
+                    timeToWallUnstick = wallStickTime;
+                }
+            }
+            else {
+                timeToWallUnstick = wallStickTime;
+            }
+        }
+        if(controller.collisions.above || controller.collisions.below) {
+            velocity.y = 0;
+        }
+
+        if (Input.GetAxis("Jump") > 0) { // if jump pressed and player is standing on surface 
+            if (wallSliding) {
+                if(wallDirectionX == input.x) {
+                    velocity.x = -wallDirectionX * wallJumbClimb.x;
+                    velocity.y = wallJumbClimb.y;
+                }
+                else if (input.x == 0) {
+                    velocity.x = -wallDirectionX * wallJumpOff.x;
+                    velocity.y = wallJumpOff.y;
+                }
+                else {
+                    velocity.x = -wallDirectionX * wallLeap.x;
+                    velocity.y = wallLeap.y;
+                }
+            }
+            if(controller.collisions.below) {
+                velocity.y = jumpVelocity;
+            }            
+        }
+        
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
