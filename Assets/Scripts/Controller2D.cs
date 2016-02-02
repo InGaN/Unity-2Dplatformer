@@ -4,13 +4,15 @@ using System.Collections;
 
 
 public class Controller2D : RaycastController {
-
-    public LayerMask collisionMask;    
-
     public CollisionInfo collisions;
 
     float maxClimbAngle = 80;
     float maxDescendAngle = 75;
+
+    public override void Start()
+    {
+        base.Start();
+    }
 
     public void Move(Vector3 velocity)
     {
@@ -18,10 +20,8 @@ public class Controller2D : RaycastController {
         collisions.Reset();
         collisions.velocityOld = velocity;
 
-        if(velocity.y < 0) {
-            DescendSlope(ref velocity);
-        }
-
+        if(velocity.y < 0) 
+            DescendSlope(ref velocity);        
         if(velocity.x != 0)
             HorizontalCollisions(ref velocity);
         if(velocity.y != 0)
