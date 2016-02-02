@@ -4,7 +4,8 @@ using System.Collections;
 [RequireComponent (typeof(Controller2D))]
 
 public class Player : MonoBehaviour {
-    public float jumpHeight = 4;
+    public float maxJumpHeight = 4;
+    public float minJumpHeight = 1;
     public float timeToJumpApex = 0.4f;
     float accelerationTimeAirborne = 0.2f;
     float accelerationTimeGrounded = 0.1f;
@@ -19,7 +20,8 @@ public class Player : MonoBehaviour {
     float timeToWallUnstick; 
 
     float gravity;
-    float jumpVelocity;
+    float maxJumpVelocity;
+    float minJumpVelocity;
     Vector3 velocity;
     float velocityXSmoothing;
 
@@ -28,10 +30,11 @@ public class Player : MonoBehaviour {
     void Start () {
         controller = GetComponent<Controller2D>();
 
-        gravity = -(2 * jumpHeight) / Mathf.Pow(timeToJumpApex, 2);
-        jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
+        gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
+        maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
+        minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
 
-        print("Gravity: " + gravity + " Jump Velocity: " + jumpVelocity);
+        print("Gravity: " + gravity + " Jump Velocity: " + maxJumpVelocity);
 	}
 
     void Update()
@@ -67,11 +70,8 @@ public class Player : MonoBehaviour {
                 timeToWallUnstick = wallStickTime;
             }
         }
-        if(controller.collisions.above || controller.collisions.below) {
-            velocity.y = 0;
-        }
-
-        if (Input.GetAxis("Jump") > 0) { // if jump pressed and player is standing on surface 
+        
+        if (Input.GetAxis("Jump") > 0) { 
             if (wallSliding) {
                 if(wallDirectionX == input.x) {
                     velocity.x = -wallDirectionX * wallJumbClimb.x;
@@ -86,12 +86,20 @@ public class Player : MonoBehaviour {
                     velocity.y = wallLeap.y;
                 }
             }
-            if(controller.collisions.below) {
-                velocity.y = jumpVelocity;
+            if(controller.collisions.below) { // if player is standing on surface
+                velocity.y = maxJumpVelocity;
             }            
+        }
+        if(Input.GetAxis("Jump") <= 0) {
+            if(velocity.y > minJumpVelocity)
+                velocity.y = minJumpVelocity;
         }
         
         velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+
+        controller.Move(velocity * Time.deltaTime, input);
+        if (controller.collisions.above || controller.collisions.below) {
+            velocity.y = 0;
+        }
     }
 }

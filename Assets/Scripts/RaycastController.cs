@@ -16,9 +16,13 @@ public class RaycastController : MonoBehaviour {
     [HideInInspector] public BoxCollider2D collider;
     [HideInInspector] public RaycastOrigins raycastOrigins;
 
+    public virtual void Awake()
+    {
+        collider = GetComponent<BoxCollider2D>();        
+    }
+
     public virtual void Start()
     {
-        collider = GetComponent<BoxCollider2D>();
         CalculateRaySpacing();
     }
 
