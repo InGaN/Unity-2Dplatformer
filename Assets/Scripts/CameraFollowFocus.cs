@@ -7,8 +7,19 @@ public class CameraFollowFocus : MonoBehaviour {
     public Vector2 focusAreaSize;
 
     public float verticalOffset;
+    public float lookAheadDistanceX;
+    public float lookSmoothTimeX;
+    public float verticalSmoothTime;
 
     FocusArea focusArea;
+
+    float currentLookAheadX;
+    float targetLookAheadX;
+    float lookAheadDirectionX;
+    float smoothLookVelocityX;
+    float smoothVelocityY;
+
+    bool lookAheadStopped;
 
     void Start()
     {
@@ -21,6 +32,23 @@ public class CameraFollowFocus : MonoBehaviour {
 
         Vector2 focusPosition = focusArea.center + Vector2.up * verticalOffset;
 
+        if(focusArea.velocity.x != 0) {
+            lookAheadDirectionX = Mathf.Sign(focusArea.velocity.x);
+            if (Mathf.Sign(target.playerInput.x) == Mathf.Sign(focusArea.velocity.x) && target.playerInput.x != 0) {
+                lookAheadStopped = false;
+                targetLookAheadX = lookAheadDirectionX * lookAheadDistanceX;
+            } 
+            else {
+                if (!lookAheadStopped) {
+                    lookAheadStopped = true;
+                    targetLookAheadX = currentLookAheadX + (lookAheadDirectionX * lookAheadDistanceX - currentLookAheadX) / 4f;
+                }
+            }
+        }        
+        currentLookAheadX = Mathf.SmoothDamp(currentLookAheadX, targetLookAheadX, ref smoothLookVelocityX, lookSmoothTimeX);
+
+        focusPosition.y = Mathf.SmoothDamp(transform.position.y, focusPosition.y, ref smoothVelocityY, verticalSmoothTime);
+        focusPosition += Vector2.right * currentLookAheadX;
         transform.position = (Vector3)focusPosition + Vector3.forward * -10;
     }
 
