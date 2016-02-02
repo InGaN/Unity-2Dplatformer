@@ -12,9 +12,13 @@ public class PlatformController : RaycastController {
 
     public float speed;
     public bool cyclic;
+    public float waitTime;
+    [Range(0,2)]
+    public float easeAmount;
 
     int fromWaypointIndex;
     float percentBetweenWaypoints;
+    float nextMoveTime;
 
     List<PassengerMovement> passengerMovement;
     Dictionary<Transform, Controller2D> passengerDictionary = new Dictionary<Transform, Controller2D>();
@@ -42,15 +46,27 @@ public class PlatformController : RaycastController {
         MovePassengers(false);
     }
 
+    float Ease(float x)
+    {
+        float a = easeAmount + 1;
+        return Mathf.Pow(x, a) / (Mathf.Pow(x,a) + Mathf.Pow(1-x,a));
+    }
+
+
     Vector3 CalculatePlatformMovement()
     {
+        if(Time.time < nextMoveTime) {
+            return Vector3.zero;
+        }
+
         fromWaypointIndex %= globalWaypoints.Length;
         int toWaypointIndex = (fromWaypointIndex + 1) % globalWaypoints.Length;
         float distanceBetweenWaypoints = Vector3.Distance(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex]);
-
         percentBetweenWaypoints += Time.deltaTime * speed/distanceBetweenWaypoints;
+        percentBetweenWaypoints = Mathf.Clamp01(percentBetweenWaypoints);
+        float easedPercentBetweenWaypoints = Ease(percentBetweenWaypoints);
 
-        Vector3 newPos = Vector3.Lerp(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex], percentBetweenWaypoints);
+        Vector3 newPos = Vector3.Lerp(globalWaypoints[fromWaypointIndex], globalWaypoints[toWaypointIndex], easedPercentBetweenWaypoints);
 
         if(percentBetweenWaypoints >= 1) {
             percentBetweenWaypoints = 0;
@@ -60,7 +76,8 @@ public class PlatformController : RaycastController {
                     fromWaypointIndex = 0;
                     System.Array.Reverse(globalWaypoints);
                 }
-            }            
+            }
+            nextMoveTime = Time.time + waitTime; 
         }
 
         return newPos - transform.position;
