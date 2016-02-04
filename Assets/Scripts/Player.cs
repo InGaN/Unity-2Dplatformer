@@ -25,10 +25,14 @@ public class Player : MonoBehaviour {
     Vector3 velocity;
     float velocityXSmoothing;
 
+    Animator animator;
+    bool grounded = false;
+
     Controller2D controller;
 
     void Start () {
         controller = GetComponent<Controller2D>();
+        animator = GetComponent<Animator>();
 
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
         maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
@@ -41,6 +45,10 @@ public class Player : MonoBehaviour {
     {
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         int wallDirectionX = (controller.collisions.left) ? -1 : 1;
+
+        grounded = controller.collisions.below;
+        animator.SetBool("Grounded", grounded);
+        animator.SetFloat("vSpeed", velocity.y);
 
         float targetVelocityX = input.x * moveSpeed;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing,
