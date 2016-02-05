@@ -44,6 +44,14 @@ public class Player : MonoBehaviour {
         print("Gravity: " + gravity + " Jump Velocity: " + maxJumpVelocity);
 	}
 
+    void FixedUpdate()
+    {
+        animator.SetBool("Grounded", grounded);        
+        animator.SetFloat("vSpeed", velocity.y);
+        animator.SetFloat("hSpeed", Mathf.Abs(velocity.x));
+        animator.SetBool("inputMove", Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0);
+    }
+
     void Update()
     {
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
@@ -54,9 +62,7 @@ public class Player : MonoBehaviour {
         else if (input.x < 0 && facingRight)
             FlipSprite();
 
-        grounded = controller.collisions.below;
-        animator.SetBool("Grounded", grounded);
-        animator.SetFloat("vSpeed", velocity.y);
+        grounded = controller.collisions.below;        
 
         float targetVelocityX = input.x * moveSpeed;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing,

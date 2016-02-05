@@ -6,10 +6,10 @@ public class CameraFollowFocus : MonoBehaviour {
     public Controller2D target;
     public Vector2 focusAreaSize;
 
-    public float verticalOffset;
-    public float lookAheadDistanceX;
-    public float lookSmoothTimeX;
-    public float verticalSmoothTime;
+    public float verticalOffset = 0f;
+    public float lookAheadDistanceX = 2.5f;
+    public float lookSmoothTimeX = 0.4f;
+    public float verticalSmoothTime = 0f;
 
     FocusArea focusArea;
 
