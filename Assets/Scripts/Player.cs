@@ -10,6 +10,7 @@ public class Player : MonoBehaviour {
     float accelerationTimeAirborne = 0.2f;
     float accelerationTimeGrounded = 0.1f;
     float moveSpeed = 6;
+    bool facingRight;
 
     public Vector2 wallJumbClimb;
     public Vector2 wallJumpOff;
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour {
     float minJumpVelocity;
     Vector3 velocity;
     float velocityXSmoothing;
+    AudioSource audio;
 
     Animator animator;
     bool grounded = false;
@@ -33,6 +35,7 @@ public class Player : MonoBehaviour {
     void Start () {
         controller = GetComponent<Controller2D>();
         animator = GetComponent<Animator>();
+        audio = GetComponent<AudioSource>();
 
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
         maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
@@ -45,6 +48,11 @@ public class Player : MonoBehaviour {
     {
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         int wallDirectionX = (controller.collisions.left) ? -1 : 1;
+
+        if (input.x > 0 && !facingRight)
+            FlipSprite();
+        else if (input.x < 0 && facingRight)
+            FlipSprite();
 
         grounded = controller.collisions.below;
         animator.SetBool("Grounded", grounded);
@@ -99,7 +107,8 @@ public class Player : MonoBehaviour {
             }            
         }
         if(Input.GetAxis("Jump") <= 0) {
-            if(velocity.y > minJumpVelocity)
+            print("JUMP!");
+            if (velocity.y > minJumpVelocity)
                 velocity.y = minJumpVelocity;
         }
         
@@ -109,5 +118,13 @@ public class Player : MonoBehaviour {
         if (controller.collisions.above || controller.collisions.below) {
             velocity.y = 0;
         }
+    }
+
+    void FlipSprite()
+    {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
     }
 }
