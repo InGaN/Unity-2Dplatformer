@@ -14,6 +14,7 @@ public class PowerupPickup : MonoBehaviour {
         if (other.gameObject.CompareTag("Player"))
             // because we destroy the object, we cannot use an attached AudioSource and Play().
             AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position);
+            ScoreScript.increment(400);
             print("PICKUP - Diamond");            
             Destroy(gameObject);
     }

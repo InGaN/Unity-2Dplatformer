@@ -107,7 +107,6 @@ public class Player : MonoBehaviour {
             }            
         }
         if(Input.GetAxis("Jump") <= 0) {
-            print("JUMP!");
             if (velocity.y > minJumpVelocity)
                 velocity.y = minJumpVelocity;
         }
