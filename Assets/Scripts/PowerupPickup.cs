@@ -11,12 +11,13 @@ public class PowerupPickup : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player")) {
             // because we destroy the object, we cannot use an attached AudioSource and Play().
             AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position);
             ScoreScript.increment(400);
-            print("PICKUP - Diamond");            
+            print("PICKUP - Diamond");
             Destroy(gameObject);
+        }
     }
 
 

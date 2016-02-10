@@ -3,7 +3,7 @@ using System.Collections;
 
 
 
-public class Controller2D : RaycastController {
+public class Controller2DEnemy : RaycastController {
     public CollisionInfo collisions;
     [HideInInspector]
     public Vector2 playerInput;
@@ -73,7 +73,6 @@ public class Controller2D : RaycastController {
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
                 if (i == 0 && slopeAngle <= maxClimbAngle) {
-                    //print("Slope angle: " + slopeAngle);
 
                     if(collisions.descendingSlope) { // prevents trouble on V shaped slopes
                         collisions.descendingSlope = false;
